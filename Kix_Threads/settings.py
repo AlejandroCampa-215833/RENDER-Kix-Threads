@@ -74,11 +74,11 @@ WSGI_APPLICATION = 'Kix_Threads.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'kix_threads_db'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
+        'NAME': os.environ.get('DB_NAME', 'postgres'),
+        'USER': os.environ.get('DB_USER', 'postgres.cdrqzutwfmpkhukmcppm'),
         'PASSWORD': os.environ.get('DB_PASSWORD', 'vt5fTBEPUgnRK9ju'),
-        'HOST': os.environ.get('DB_HOST', 'db.cdrqzutwfmpkhukmcppm.supabase.co'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'HOST': os.environ.get('DB_HOST', 'aws-0-us-east-2.pooler.supabase.com'),
+        'PORT': os.environ.get('DB_PORT', '6543'),
         'OPTIONS': {'sslmode': 'require'},  # Supabase requiere SSL
     }
 }
