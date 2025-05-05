@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Sitio oficial de Kix Threads {% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'products/home.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+<!-- Sección de Producto Destacado -->
+<section class="featured-product">
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <div class="col-12">
+                <div class="featured-product-container" style="position: relative; overflow: hidden;">
+                    <img src="{% static 'images/jordanR.png' %}" alt="Air Jordan Retro" style="width: 70%; height: auto; object-fit: cover; filter: brightness(0.7); position: absolute; top: 0; left: 25%; z-index: 1;">
+                    <div class="featured-product-content" style="position: relative; z-index: 2;">
+                        <h2 class="featured-category">NUEVA COLECCIÓN</h2>
+                        <h1 class="featured-title">Air Jordan Retro</h1>
+                        <p class="featured-description">
+                            Descubre la nueva colección de Air Jordan Retro, diseñada para combinar estilo y rendimiento.
+                            Disponible en varios colores y tallas.
+                        </p>
+                        <a href="{% url 'products' %}?category=calzado" class="btn btn-dark featured-button">EMPEZAR A COMPRAR</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECCIÓN 2: Categorías en Cuadrícula -->
+<section class="categories-grid py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">CATEGORÍAS DESTACADAS</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="category-card">
+                    <div class="category-image">
+                        <img src="{% static 'images/hombre.avif' %}" alt="Moda Hombre" class="img-fluid">
+                        <div class="category-overlay">
+                            <h3>HOMBRES</h3>
+                            <a href="{% url 'products' %}?gender=M" class="btn btn-outline-light">Ver Colección</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="category-card">
+                    <div class="category-image">
+                        <img src="{% static 'images/nuevo.avif' %}" alt="Moda Mujer" class="img-fluid">
+                        <div class="category-overlay">
+                            <h3>MUJERES</h3>
+                            <a href="{% url 'products' %}?gender=F" class="btn btn-outline-light">Ver Colección</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="category-card">
+                    <div class="category-image">
+                        <img src="{% static 'images/mujer.avif' %}" alt="Accesorios" class="img-fluid">
+                        <div class="category-overlay">
+                            <h3>UNISEX</h3>
+                            <a href="{% url 'products' %}?gender=U" class="btn btn-outline-light">Ver Colección</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'products' %}" class="btn btn-dark px-4 py-2">VER TODOS LOS PRODUCTOS</a>
+    </div>
+</section>
+
+{% endblock %}

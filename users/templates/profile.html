@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Perfil - Kix Threads{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Información del perfil -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" alt="Avatar de {{ user.username }}" class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'images/adminImage.png' %}" alt="Avatar predeterminado" class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+                    
+                    <h3 class="mb-0">{{ user.username }}</h3>
+                    <p class="text-muted">{{ user.email }}</p>
+                    
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{% url 'profile_settings' %}" class="btn btn-outline-dark rounded-pill">Detalles perfil</a>
+                        <a href="{% url 'logout' %}" class="btn btn-dark rounded-pill">Cerrar sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historial de pedidos -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="mb-4">Mis pedidos recientes</h4>
+                    
+                    {% if orders %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders|slice:":3" %}
+                                    <tr>
+                                        <td>{{ order.date_ordered|date:"d/m/Y" }}</td>
+                                        <td>${{ order.total_price }}</td>
+                                        <td>
+                                            {% if order.status == 'PENDING' %}
+                                                <span class="badge bg-warning text-dark">Pendiente</span>
+                                            {% elif order.status == 'PROCESSING' %}
+                                                <span class="badge bg-info text-dark">Procesando</span>
+                                            {% elif order.status == 'SHIPPED' %}
+                                                <span class="badge bg-primary">Enviado</span>
+                                            {% elif order.status == 'DELIVERED' %}
+                                                <span class="badge bg-success">Entregado</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ order.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-dark">Ver detalles</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if orders|length > 3 %}
+                            <div class="text-center mt-3">
+                                <a href="{% url 'order_history' %}" class="btn btn-outline-dark rounded-pill">Ver todos mis pedidos ({{ orders|length }})</a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            No tienes pedidos recientes.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+        <!-- Productos favoritos -->
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-body p-4"> 
+                <h4 class="mb-4">Mis favoritos</h4>
+                {% if favorites %}
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                        {% for favorite in favorites|slice:":6" %}
+                            <div class="col">
+                                <div class="card h-100 border-0 shadow-sm product-card" style="max-width: 220px; margin: 0 auto;">
+                                    <div class="position-relative">
+                                        {% if favorite.product.image %}
+                                        <a href="{% url 'product_detail' favorite.product.id_product_detail %}">
+                                            <img src="{{ favorite.product.image.image.url }}" class="card-img-top" alt="{{ favorite.product.product.name }}" style="height: 120px; object-fit: scale-down;">
+                                        </a>
+                                        {% else %}
+                                            <img src="{% static 'images/adminImage.png' %}" class="card-img-top" alt="Sin imagen" style="height: 120px; object-fit: cover;">
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title text-truncate" style="font-weight: bold;">{{ favorite.product.product.name }}</h6>
+                                        <p class="card-text mb-1">
+                                            <span class="badge" style="text-transform: uppercase; background-color: {{ favorite.product.color.name }}; ">{{ favorite.product.color.name }}</span>
+                                            <span class="badge bg-secondary">{{ favorite.product.size.size }}</span>
+                                        </p>
+                                        <p class="card-text fw-bold mb-2">${{ favorite.product.price }}</p>
+                                        <a href="{% url 'product_detail' favorite.product.id_product_detail%}" class="btn btn-dark btn-sm w-100">Ver Detalles</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if favorites|length > 6 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'favorites' %}" class="btn btn-outline-dark rounded-pill">Ver todos mis favoritos ({{ favorites|length }})</a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-info">
+                        No tienes productos favoritos.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

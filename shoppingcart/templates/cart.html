@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bolsa Kix Threads{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Columna izquierda: Productos en el carrito -->
+        <div class="col-lg-8">
+            <h2 class="mb-4">Bolsa de compra</h2>
+            {% if cart_items %}
+                {% for item in cart_items %}
+                <div class="card mb-4 border-0">
+                    <div class="row g-0">
+                        <div class="col-md-2">
+                            {% if item.product.image %}
+                                <a href="{% url 'product_detail' item.product.id_product_detail %}">
+                                    <img src="{{ item.product.image.image.url }}" class="img-fluid rounded" alt="{{ item.product.product.name }}">
+                                </a>
+                            {% else %}
+                                <img src="{% static 'images/placeholder.jpg' %}" class="img-fluid rounded" alt="Producto">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-10">
+                            <div class="card-body d-flex justify-content-between">
+                                <div>
+                                    <a href="{% url 'product_detail' item.product.id_product_detail %}" style="text-decoration: none;" class="card-title">
+                                        <h5 class="card-title" style="font-weight: bold;">{{ item.product.product.name }}</h5>
+                                    </a>
+                                    <p class="card-text mb-1">{{ item.product.product.description }}</p>
+                                    <p class="card-text mb-1">Color: {{ item.product.color.name }}</p>
+                                    <p class="card-text mb-1 text-dark">Talla: {{ item.product.size.size }}</p>
+                                </div>
+                                <div class="text-end">
+                                    <p class="fw-bold">${{ item.product.price }}</p>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
+                                <div class="quantity-controls">
+                                    <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-outline-secondary rounded-circle btn-sm"><i class="bi bi-trash"></i></a>
+                                    <a href="{% url 'update_cart_item' item.id 'decrease' %}" class="btn btn-outline-secondary rounded-circle btn-sm"><i class="bi bi-dash"></i></a>
+                                    <span class="mx-2">{{ item.quantity }}</span>
+                                    <a href="{% url 'update_cart_item' item.id 'increase' %}" class="btn btn-outline-secondary rounded-circle btn-sm"><i class="bi bi-plus"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if not forloop.last %}
+                <hr>
+                {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">
+                    Tu carrito está vacío. <a href="/" class="alert-link">Continúa comprando</a>.
+                </div>
+            {% endif %}
+            
+        </div>
+        
+        <!-- Columna derecha: Resumen de compra -->
+        <div class="col-lg-4">
+            <div class="card border-0 bg-light p-4">
+                <h3 class="mb-4">Resumen</h3>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal</span>
+                    <span class="fw-bold">${{ cart.get_total }}</span>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2 p-r-10">
+                    <span>Gastos de envío y gestión estimados</span>
+                    <span class="fw-bold">Gratis</span>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="fw-bold">Total</span>
+                    <span class="fw-bold">${{ cart.get_total }}</span>
+                </div>
+                
+                <button class="btn btn-dark rounded-pill py-3 mb-3 d-flex justify-content-center align-items-center">
+                    <a href="{% url 'checkout' %}" class="text-white text-decoration-none d-flex align-items-center">
+                        <i class="bi bi-credit-card me-2"></i>
+                        Proceder a pago
+                    </a>
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

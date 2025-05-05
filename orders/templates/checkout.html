@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Finalizar Compra - Kix Threads{% endblock title %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <!-- Columna izquierda: Formulario de pedido -->
+        <div class="col-lg-8">
+            <h2 class="mb-4">Finalizar Compra</h2>
+            
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h4 class="mb-3">Información de Envío</h4>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            Por favor corrige los errores en el formulario.
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.shipping_address.id_for_label }}" class="form-label">{{ form.shipping_address.label }}</label>
+                            {{ form.shipping_address }}
+                            {% if form.shipping_address.errors %}
+                            <div class="text-danger">
+                                {{ form.shipping_address.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <h4 class="mb-3 mt-4">Método de Pago</h4>
+                        
+                        <div class="mb-3">
+                            {% for radio in form.pay_method %}
+                            <div class="form-check mb-2">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                    {{ radio.choice_label }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                            {% if form.pay_method.errors %}
+                            <div class="text-danger">
+                                {{ form.pay_method.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-dark rounded-pill py-3">Confirmar Pedido</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Columna derecha: Resumen de compra -->
+        <div class="col-lg-4">
+            <div class="card border-0 bg-light p-4 shadow-sm">
+                <h3 class="mb-4">Resumen del Pedido</h3>
+                
+                {% for item in cart_items %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span>{{ item.quantity }} x {{ item.product.product.name }}</span>
+                    <span class="fw-bold">${{ item.get_subtotal }}</span>
+                </div>
+                {% endfor %}
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal</span>
+                    <span class="fw-bold">${{ cart.get_total }}</span>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Gastos de envío</span>
+                    <span class="fw-bold">Gratis</span>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="fw-bold">Total</span>
+                    <span class="fw-bold">${{ cart.get_total }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

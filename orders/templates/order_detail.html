@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalle de Pedido #{{ order.id }} - Kix Threads{% endblock title %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Detalle de Pedido #{{ order.id }}</h2>
+        <a href="{% url 'order_history' %}" class="btn btn-outline-dark rounded-pill">Volver a mis pedidos</a>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h4 class="mb-3">Productos</h4>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order_items %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if item.product.image %}
+                                                <img src="{{ item.product.image.image.url }}" alt="{{ item.product.product.name }}" class="img-thumbnail me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                            {% else %}
+                                                <img src="{% static 'images/adminImage.png' %}" alt="{{ item.product.product.name }}" class="img-thumbnail me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                            {% endif %}
+                                            <div>
+                                                <p class="mb-0">{{ item.product.product.name }}</p>
+                                                <small class="text-muted">Talla: {{ item.product.size.size }} | Color: {{ item.product.color.name }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.price }}</td>
+                                    <td>${{ item.get_total }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" class="text-end">Total:</th>
+                                    <th>${{ order.total_price }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h4 class="mb-3">Información del Pedido</h4>
+                    
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span>Estado:</span>
+                            <span>
+                                {% if order.status == 'PENDING' %}
+                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                {% elif order.status == 'PROCESSING' %}
+                                    <span class="badge bg-info text-dark">Procesando</span>
+                                {% elif order.status == 'SHIPPED' %}
+                                    <span class="badge bg-primary">Enviado</span>
+                                {% elif order.status == 'DELIVERED' %}
+                                    <span class="badge bg-success">Entregado</span>
+                                {% elif order.status == 'CANCELLED' %}
+                                    <span class="badge bg-danger">Cancelado</span>
+                                {% elif order.status == 'RETURNED' %}
+                                    <span class="badge bg-secondary">Devuelto</span>
+                                {% endif %}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span>Fecha:</span>
+                            <span>{{ order.date_ordered|date:"d/m/Y H:i" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span>Método de pago:</span>
+                            <span>{{ order.get_pay_method_display }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span>Dirección de envío:</span>
+                            <span>{{ order.shipping_address }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

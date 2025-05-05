@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Favoritos - Kix Threads{% endblock title %}
+
+{% block extra_js %}
+<script src="{% static 'users/favorites.js' %}"></script>
+{% endblock extra_js %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Lista de favoritos -->
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">Mis Favoritos</h3>
+                    
+                    {% if favorites %}
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+                            {% for favorite in favorites %}
+                                <div class="col">
+                                    <div class="card h-100 border-0 shadow-sm product-card" style="max-width: 220px; margin: 0 auto;">
+                                        <div class="position-relative">
+                                            {% if favorite.product.image %}
+                                            <a href="{% url 'product_detail' favorite.product.id_product_detail %}">
+                                                <img src="{{ favorite.product.image.image.url }}" class="card-img-top" alt="{{ favorite.product.product.name }}" style="height: 160px; object-fit:scale-down;">
+                                            </a>
+                                            {% else %}
+                                                <img src="{% static 'images/adminImage.png' %}" class="card-img-top" alt="Sin imagen" style="height: 160px; object-fit: cover;">
+                                            {% endif %}
+                                            <!-- Botón para eliminar de favoritos -->
+                                            {% if favorite.product and favorite.product.id_product_detail %}
+                                                <a href="{% url 'remove_favorite' favorite.product.id_product_detail %}" class="position-absolute top-0 end-0 p-2 text-danger remove-favorite">
+                                                    <i class="bi bi-heart-fill" style="font-size: 1.5rem;"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title text-truncate" style="font-weight: bold;">{{ favorite.product.product.name | upper }}</h6>
+                                            <p class="card-text mb-1">
+                                                <span class="badge" style="text-transform: uppercase; background-color: {{ favorite.product.color.name }}; ">{{ favorite.product.color.name }}</span>
+                                                <span class="badge bg-secondary">{{ favorite.product.size.size }}</span>
+                                            </p>
+                                            <p class="card-text fw-bold mb-2">${{ favorite.product.price }}</p>
+                                            <a href="{% url 'product_detail' favorite.product.id_product_detail %}" class="btn btn-dark btn-sm w-100">Ver Detalles</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-heart" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="mt-3">No tienes productos favoritos aún.</p>
+                            <a href="{% url 'products' %}" class="btn btn-dark mt-2">Explorar productos</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.product.name }} - Kix Threads{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'products/product_detail.css' %}">
+{% endblock extra_css%}
+
+{% block extra_js %}
+<script src="{% static 'products/product_detail.js' %}"></script>
+{% endblock extra_js %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Columna izquierda: Imagen del producto -->
+        <div class="col-md-6 mb-4">
+            <div class="product-image-container">
+                {% if product.image %}
+                    <img src="{{ product.image.image.url }}" alt="{{ product.product.name }}" class="img-fluid rounded product-detail-image">
+                {% else %}
+                    <img src="{% static 'images/adminImage.png' %}" alt="Sin imagen" class="img-fluid rounded product-detail-image">
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Columna derecha: Información del producto -->
+        <div class="col-md-6">
+            <div class="product-info">
+                <h2 class="product-title mb-2">{{ product.product.name }}</h2>
+                <p class="product-description mb-3">{{ product.product.description }}</p>
+                
+                <div class="product-price mb-4">
+                    <span class="current-price">${{ product.price }}</span>
+                </div>
+                
+                <!-- Selección de color -->
+                <div class="color-selection mb-4">
+                    <h5 class="option-title">Color: <span class="selected-option">{{ product.color.name }}</span></h5>
+                    <div class="color-options">
+                        {% for variant in color_variants %}
+                            <a href="{% url 'product_detail' variant.id_product_detail %}" class="color-option {% if variant.color.id == product.color.id %}active{% endif %}" style="background-color: {{ variant.color.name }};" title="{{ variant.color.name }}"></a>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Selección de talla -->
+                <div class="size-selection mb-4">
+                    <h5 class="option-title">Talla: <span class="selected-option">{{ product.size.size }}</span></h5>
+                    <div class="size-options">
+                        {% for variant in size_variants %}
+                            <a href="{% url 'product_detail' variant.id_product_detail %}" class="size-option {% if variant.size.id == product.size.id %}active{% endif %} {% if variant.stock <= 0 %}disabled{% endif %} ">
+                                {{ variant.size.size }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Disponibilidad -->
+                <div class="availability mb-4">
+                    {% if product.stock > 0 %}
+                        <p class="text-success"><i class="bi bi-check-circle-fill"></i> En stock ({{ product.stock }} disponibles)</p>
+                    {% else %}
+                        <p class="text-danger"><i class="bi bi-x-circle-fill"></i> Agotado</p>
+                    {% endif %}
+                </div>
+
+                <!-- Botones de acción -->
+                {% if user.is_authenticated %}
+                <div class="product-actions d-flex flex-column w-100 gap-2 mb-4">
+                    <a href="{% url 'add_favorite' product.id_product_detail %}" class="btn btn-outline-dark add-to-favorites-btn w-100 py-2" data-product-id="{{ product.id_product_detail }}">
+                        <i class="bi bi-heart me-2"></i>Agregar a favoritos
+                    </a>
+                    {% if product.stock > 0 %}
+                        <a href="{% url 'add_to_cart' product.id_product_detail %}" class="btn add-to-cart-btn btn-outline-dark w-100 py-2">
+                            <i class="bi bi-bag-plus me-2"></i>Agregar a la bolsa
+                        </a>
+                    {% else %}
+                        <button class="btn btn-dark w-100 py-2" disabled>
+                            <i class="bi bi-bag-plus me-2"></i>Agotado
+                        </button>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="product-actions d-flex flex-column w-100 gap-2 mb-4">
+                    <a href="{% url 'login' %}" class="btn btn-outline-dark w-100 py-2">
+                        <i class="bi bi-heart me-2"></i>Agregar a favoritos
+                    </a>
+                    {% if product.stock > 0 %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-dark w-100 py-2">
+                            <i class="bi bi-bag-plus me-2"></i>Agregar a la bolsa
+                        </a>
+                    {% else %}
+                        <button class="btn btn-dark w-100 py-2" disabled>
+                            <i class="bi bi-bag-plus me-2"></i>Agotado
+                        </button>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Información adicional -->
+                <div class="additional-info mt-4">
+                    <div class="accordion" id="productAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingDetails">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetails" aria-controls="collapseDetails">
+                                    Detalles del producto
+                                </button>
+                            </h2>
+                            <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails" data-bs-parent="#productAccordion">
+                                <div class="accordion-body">
+                                    <p>{{ product.product.description }}</p>
+                                    <ul>
+                                        <li>Marca: {{ product.product.brand.name }}</li>
+                                        <li>Categoría: {{ product.product.category.name }}</li>
+                                        <li>Color: {{ product.color.name }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingShipping">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseShipping" aria-expanded="false" aria-controls="collapseShipping">
+                                    Envío y devoluciones
+                                </button>
+                            </h2>
+                            <div id="collapseShipping" class="accordion-collapse collapse" aria-labelledby="headingShipping" data-bs-parent="#productAccordion">
+                                <div class="accordion-body">
+                                    <p>Envío gratuito en pedidos superiores a $50.000.</p>
+                                    <p>Tiempo estimado de entrega: 3-5 días hábiles.</p>
+                                    <p>Devoluciones gratuitas dentro de los 30 días posteriores a la compra.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Sistema de notificaciones -->
+<div class="position-fixed top-0 start-0 p-3" style="z-index: 11">
+    <div id="addToCartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Kix Threads</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Producto añadido a la bolsa correctamente.
+        </div>
+    </div>
+    
+    <div id="addToFavoritesToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Kix Threads</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Producto añadido a favoritos correctamente.
+        </div>
+    </div>
+</div>
+
+{% endblock %}

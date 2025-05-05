@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configuración de Perfil - Kix Threads{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Menú lateral -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Mi cuenta</h5>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'profile' %}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-person me-2"></i> Perfil
+                        </a>
+                        <a href="{% url 'profile_settings' %}" class="list-group-item list-group-item-action active">
+                            <i class="bi bi-gear me-2"></i> Configuración
+                        </a>
+                        <a href="{% url 'order_history' %}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-bag me-2"></i> Mis pedidos
+                        </a>
+                        <a href="{% url 'favorites' %}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-heart me-2"></i> Favoritos
+                        </a>
+                        <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Formulario de configuración -->
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">Configuración de perfil</h3>
+                    
+                    {% if messages %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {% for message in messages %}
+                            {{ message }}
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" action="{% url 'profile_settings' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-3 text-center">
+                                <div class="avatar-container mb-3">
+                                    {% if user.profile.avatar %}
+                                        <img src="{{ user.profile.avatar.url }}" alt="Avatar de {{ user.username }}" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                    {% else %}
+                                        <img src="{% static 'images/adminImage.png' %}" alt="Avatar predeterminado" class="img-fluid rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="avatar" class="form-label">Cambiar avatar</label>
+                                    <input class="form-control form-control-sm" id="avatar" name="avatar" type="file" accept="image/*">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-9">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="username" class="form-label">Nombre de usuario</label>
+                                        <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" readonly>
+                                        <div class="form-text">El nombre de usuario no se puede cambiar.</div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Correo electrónico</label>
+                                        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="first_name" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="last_name" class="form-label">Apellido</label>
+                                        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mb-3">Información de contacto</h4>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.profile.phone|default:'' }}">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="address" class="form-label">Dirección</label>
+                                <input type="text" class="form-control" id="address" name="address" value="{{ user.profile.address|default:'' }}">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="city" class="form-label">Ciudad</label>
+                                <input type="text" class="form-control" id="city" name="city" value="{{ user.profile.city|default:'' }}">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="state" class="form-label">Estado/Provincia</label>
+                                <input type="text" class="form-control" id="state" name="state" value="{{ user.profile.state|default:'' }}">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="zip_code" class="form-label">Código postal</label>
+                                <input type="text" class="form-control" id="zip_code" name="zip_code" value="{{ user.profile.zip_code|default:'' }}">
+                            </div>
+                        </div>
+                        
+                        <h4 class="mb-3">Cambiar contraseña</h4>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="current_password" class="form-label">Contraseña actual</label>
+                                <input type="password" class="form-control" id="current_password" name="current_password">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="new_password" class="form-label">Nueva contraseña</label>
+                                <input type="password" class="form-control" id="new_password" name="new_password">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="confirm_password" class="form-label">Confirmar contraseña</label>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-dark rounded-pill px-4">Guardar cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Productos - Kix Threads{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'products/products.css' %}">
+{% endblock extra_css %}
+
+{% block extra_js %}
+<script src="{% static 'products/products.js' %}"></script>
+{% endblock extra_js %}
+
+{% block content %}
+    <!-- Sección superior: información de categoría y controles -->
+    <div class="container mt-4">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="category-info">
+                    <h2 class="category-title">Productos</h2>
+                    <p class="product-count">{{ products|length }} productos</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="product-controls d-flex justify-content-end">
+                    <button id="toggleFilters" class="btn btn-outline-dark me-3 d-md-none">
+                        <i class="bi bi-funnel"></i> Filtros
+                    </button>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-dark dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Ordenar por
+                        </button>
+                        <ul class="dropdown-menu pt-2 bg-light dropdown-menu-end" aria-labelledby="sortDropdown" style="min-width: 185px; padding: 5px;">
+                            <li><a class="dropdown-item" href="{% url 'products' %}?sort=price_asc">Precio: Menor a Mayor</a></li>
+                            <li><a class="dropdown-item" href="{% url 'products' %}?sort=price_desc">Precio: Mayor a Menor</a></li>
+                            <li><a class="dropdown-item" href="{% url 'products' %}?sort=name_asc">Nombre: A-Z</a></li>
+                            <li><a class="dropdown-item" href="{% url 'products' %}?sort=name_desc">Nombre: Z-A</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sección principal: filtros y productos -->
+    <div class="container mt-4 mb-5">
+        <div class="row">
+            <!-- Columna de filtros (derecha en móvil, izquierda en desktop) -->
+            <div id="filtersColumn" class="col-md-3 order-md-1 order-2 mb-4 d-md-block">
+                <div class="filters-container p-3 bg-light rounded">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="m-0">Filtros</h4>
+                        <button type="button" id="closeFilters" class="btn-close d-md-none" aria-label="Cerrar"></button>
+                    </div>
+                    
+                    <form class="filter-form" method="get" action="{% url 'products' %}">
+                        <!-- Preservar parámetro de ordenamiento si existe -->
+                        {% if request.GET.sort %}
+                        <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+                        {% endif %}
+                        
+                        <!-- Filtro por categoría -->
+                        <div class="filter-section mb-4">
+                            <h5 class="filter-title">Categorías</h5>
+                            {% for category in categories %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="category" value="{{ category.id_category }}" id="category{{ category.id_category }}" 
+                                    {% if category.id_category|stringformat:"i" == request.GET.category or category.name|lower == request.GET.category.lower %}checked{% endif %}>
+                                <label class="form-check-label" for="category{{ category.id_category }}">
+                                    {{ category.name }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Filtro por marca -->
+                        <div class="filter-section mb-4">
+                            <h5 class="filter-title">Marcas</h5>
+                            {% for brand in brands %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="brand" value="{{ brand.id_brand }}" id="brand{{ brand.id_brand }}"
+                                    {% if brand.id_brand|stringformat:"i" == request.GET.brand %}checked{% endif %}>
+                                <label class="form-check-label" for="brand{{ brand.id_brand }}">
+                                    {{ brand.name }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+
+                        <!-- Filtro por color -->
+                        <div class="filter-section mb-4">
+                            <h5 class="filter-title">Colores</h5>
+                            <div class="color-filters d-flex flex-wrap">
+                                {% for color in colors %}
+                                <div class="form-check me-2 mb-2" style="margin:0px; padding:0;">
+                                    <input class="form-check-input visually-hidden" type="radio" name="color" value="{{ color.id_color }}" id="color{{ color.id_color }}"
+                                        {% if color.id_color|stringformat:"i" == request.GET.color %}checked{% endif %}>
+                                    <label class="form-check-label color-filter {% if color.id_color|stringformat:'i' == request.GET.color %} selected-color {% endif %}" for="color{{ color.id_color }}" 
+                                        style="background-color: {{ color.name }}; width: 35px; height:35px; display:block; border:none; border-radius: 50%;" title="{{ color.name }}">
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Filtro por género -->
+                        <div class="filter-section mb-4">
+                            <h5 class="filter-title">Género</h5>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="gender" value="M" id="genderMale"
+                                    {% if 'M' == request.GET.gender %}checked{% endif %}>
+                                <label class="form-check-label" for="genderMale">
+                                    Hombre
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="gender" value="F" id="genderFemale"
+                                    {% if 'F' == request.GET.gender %}checked{% endif %}>
+                                <label class="form-check-label" for="genderFemale">
+                                    Mujer
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="gender" value="U" id="genderUnisex"
+                                    {% if 'U' == request.GET.gender %}checked{% endif %}>
+                                <label class="form-check-label" for="genderUnisex">
+                                    Unisex
+                                </label>
+                            </div>
+                        </div>
+ 
+                        <!-- Botone limpiar -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'products' %}" class="btn btn-outline-dark">Limpiar filtros</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Columna de productos (izquierda en móvil, derecha en desktop) -->
+            <div class="col-md-9 order-md-2 order-1">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 products-container">
+                    {% for product in products %}
+                    <div class="col">
+                        <div class="card h-100 product-card">
+                            <div class="position-relative">
+                                <a href="{% url 'product_detail' product.id_product_detail %}" class="product-link">
+                                    {% if product.image %}
+                                    <img src="{{ product.image.image.url }}" class="card-img-top" alt="{{ product.product.name }}">
+                                    {% else %}
+                                    <img src="{% static 'images/adminImage.png' %}" class="card-img-top" alt="Sin imagen">
+                                    {% endif %}
+                                </a>
+                                {% if user.is_authenticated %}
+                                <a href="{% url 'add_favorite' product.id_product_detail %}" class="btn btn-light btn-sm position-absolute top-2 end-2 p-2 shadow-sm favorite-btn" data-product-id="{{ product.id_product_detail }}">
+                                    <i class="bi bi-heart-fill"></i>
+                                </a>
+                                {% else %}
+                                <a href="{% url 'login' %}" class="btn btn-light btn-sm position-absolute top-2 end-2 p-2 shadow-sm favorite-btn">
+                                    <i class="bi bi-heart-fill"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <span class="badge rounded-pill mb-2" style="background-color: {{ product.color.name }}; color:{% if product.color.name == 'WHITE' or product.color.name == 'YELLOW' %} black {% else %} white {% endif %}; border:0.2px solid black;">{{ product.color.name }}</span>
+                                <span class="badge rounded-pill mb-2" style="background-color: white; border:1px solid black; width: 45px; height: 25px; color:black;">{{ product.size }}</span>
+                                <h5 class="card-title">{{ product.product.name }}</h5>
+                                <p class="card-text description">{{ product.product.description|truncatechars:50 }}</p>
+                                <p class="card-text price">${{ product.price }} MXN</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <p>No se encontraron productos que coincidan con los filtros seleccionados.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Botón para cargar más productos -->
+                {% if has_more_products %}
+                <div class="text-center mt-5 mb-5">
+                    <a href="?page={{ next_page }}" id="loadMoreBtn" class="btn btn-outline-dark px-4 py-2">
+                        Cargar más productos
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
