@@ -74,7 +74,7 @@ class ProductDetail(models.Model):
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
     image = models.ForeignKey(Image, on_delete=models.CASCADE, null=True, blank=True)
 
-    price = models.DecimalField(max_digits=5, decimal_places=2, default=0, null=False, blank=False)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=False, blank=False)
     stock = models.IntegerField(default=0, null=False, blank=False)
     
     # class Meta genera que no existan productos con el mismo id_product, id_size y id_color en la base de datos
