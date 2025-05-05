@@ -9,6 +9,7 @@ python manage.py collectstatic --noinput
 python manage.py makemigrations
 python manage.py migrate
 
-
 # Crea un superusuario
 python create_superuser.py
+
+python test_db_connection.py

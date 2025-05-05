@@ -70,23 +70,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Kix_Threads.wsgi.application'
 
+# Configuración para PostgreSQL/Supabase
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'kix_threads_db'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'vt5fTBEPUgnRK9ju'),
+        'HOST': os.environ.get('DB_HOST', 'db.cdrqzutwfmpkhukmcppm.supabase.co'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
+        'OPTIONS': {'sslmode': 'require'},  # Supabase requiere SSL
     }
 }
-
-# Configuración para usar PostgreSQL en Render
-import dj_database_url
-database_url = os.environ.get('DATABASE_URL')
-if database_url:
-    DATABASES['default'] = dj_database_url.config(
-        default=database_url,
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
