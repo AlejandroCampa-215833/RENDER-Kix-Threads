@@ -22,11 +22,6 @@ def create_superuser():
     password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
 
     try:
-
-        # Verificar si las tablas necesarias existen
-        if not check_tables_exist():
-            print("Error: La tabla auth_user no existe. Las migraciones pueden no haberse aplicado correctamente.")
-            sys.exit(1)
         
         # Verificar si el usuario ya existe
         if User.objects.filter(username=username).exists():
