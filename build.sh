@@ -12,3 +12,4 @@ python manage.py migrate
 python test_db_connection.py
 
 python create_superuser.py
+
